@@ -46,6 +46,7 @@ static const char *TAG = "AdeServer";
 void signal_gpio(int pin) {
     gpio_set_direction(pin, GPIO_MODE_OUTPUT);
     gpio_set_level(pin, 1);
+    gpio_set_pull_mode(pin, GPIO_PULLDOWN_ONLY);
     vTaskDelay(100);
     gpio_set_level(pin, 0);
 }
@@ -60,7 +61,7 @@ static esp_err_t button_activated(httpd_req_t *req)
         if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
             ESP_LOGI(TAG, "Found URL query => %s", buf);
             char param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN], dec_param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN] = {0};
-            if (httpd_query_key_value(buf, "button", param, sizeof(param)) == ESP_OK) {
+            if (httpd_query_key_value(buf, "btn", param, sizeof(param)) == ESP_OK) {
                 example_uri_decode(dec_param, param, strnlen(param, EXAMPLE_HTTP_QUERY_KEY_MAX_LEN));
                 int found_index = -1;
                 for (int i = 0; i < button_number; i++) {
@@ -93,7 +94,49 @@ static const httpd_uri_t btn_activate = {
     .method    = HTTP_GET,
     .handler   = button_activated,
 };
-
+//button_deactivate handler
+static esp_err_t button_deactivated(httpd_req_t *req)
+{
+    char*  buf;
+    size_t buf_len;
+    buf_len = httpd_req_get_url_query_len(req) + 1;
+    if (buf_len > 1) {
+        buf = malloc(buf_len);
+        if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
+            ESP_LOGI(TAG, "Found URL query => %s", buf);
+            char param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN], dec_param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN] = {0};
+            if (httpd_query_key_value(buf, "btn", param, sizeof(param)) == ESP_OK) {
+                example_uri_decode(dec_param, param, strnlen(param, EXAMPLE_HTTP_QUERY_KEY_MAX_LEN));
+                int found_index = -1;
+                for (int i = 0; i < button_number; i++) {
+                    if (strcmp(button_names[i], dec_param) == 0) {
+                        found_index = i;
+                        break; 
+                    }
+                }
+                if(found_index >= 0) {
+                    signal_gpio(button_map[found_index].pin);
+                    ESP_LOGI(TAG, "Button %s deactivated", dec_param);
+                    httpd_resp_send(req, "ok", HTTPD_RESP_USE_STRLEN);
+                    return ESP_OK;
+                } else {
+                    ESP_LOGI(TAG, "Button %s not found", dec_param);
+                    httpd_resp_send(req, "error", HTTPD_RESP_USE_STRLEN);
+                }
+            } else {
+                
+            }
+        }
+        free(buf);
+    }
+    httpd_resp_send(req, "error", HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+static const httpd_uri_t btn_deactivate = {
+    .uri       = "/btn_deactivate",
+    .method    = HTTP_GET,
+    .handler   = button_deactivated,
+};
 static httpd_handle_t start_webserver(void)
 {
     httpd_handle_t server = NULL;
