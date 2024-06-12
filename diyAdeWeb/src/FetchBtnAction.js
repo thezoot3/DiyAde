@@ -31,12 +31,15 @@ export default function useFetchBtnAction(
     function stopStopwatch(id) {
         clearInterval(intervalMap[id])
     }
-    function fetchBtn(resource) {
-        fetch(pathSrc + resource)
-            .then((response) => response.json())
-            .then((data) => console.log(data))
-            .catch((err) => console.log(err))
-    }
+    const fetchBtn = useCallback(
+        (resource) => {
+            fetch(pathSrc + resource)
+                .then((response) => response.json())
+                .then((data) => console.log(data))
+                .catch((err) => console.log(err))
+        },
+        [pathSrc],
+    )
     function startTouch(btn) {
         return function () {
             fetchBtn('/btn_activate?btn=' + btn)
