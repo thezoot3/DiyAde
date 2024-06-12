@@ -7,6 +7,15 @@ export default function useFetchBtnAction(
 ) {
     const [Millisec, setInitMillisec] = useState(0)
     const [intervalMap, setIntervalMap] = useState({})
+    const fetchBtn = useCallback(
+        (resource) => {
+            fetch(pathSrc + resource)
+                .then((response) => response.json())
+                .then((data) => console.log(data))
+                .catch((err) => console.log(err))
+        },
+        [pathSrc],
+    )
     const resetStopwatch = useCallback(() => {
         setInitMillisec(maxMillisec)
         setTimeout(() => {
@@ -31,15 +40,6 @@ export default function useFetchBtnAction(
     function stopStopwatch(id) {
         clearInterval(intervalMap[id])
     }
-    const fetchBtn = useCallback(
-        (resource) => {
-            fetch(pathSrc + resource)
-                .then((response) => response.json())
-                .then((data) => console.log(data))
-                .catch((err) => console.log(err))
-        },
-        [pathSrc],
-    )
     function startTouch(btn) {
         return function () {
             fetchBtn('/btn_activate?btn=' + btn)
