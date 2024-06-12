@@ -14,13 +14,13 @@ static char* button_names[button_number] = {
     "lemon",
     "grapefruit",
     "green_grape",
-    "stop"
+    "done"
 };
 
 static button_t button_map[button_number] = {
-    {"lemon", 32},
-    {"grapefruit", 33},
-    {"green_grape", 34},
-    {"stop", 35}
+    {"lemon", 25},
+    {"grapefruit", 26},
+    {"green_grape", 32},
+    {"done", 33}
 };
 

@@ -50,6 +50,14 @@ void signal_gpio(int pin) {
     vTaskDelay(100);
     gpio_set_level(pin, 0);
 }
+void signal_serial(char* prefix, char* name) {
+    char* message = malloc(strlen(prefix) + strlen(name) + 3);
+    strcpy(message, prefix);
+    strcpy(message, " ");
+    strcat(message, name);
+    printf(message);
+    free(message);
+}
 
 static esp_err_t button_activated(httpd_req_t *req)
 {
@@ -71,7 +79,8 @@ static esp_err_t button_activated(httpd_req_t *req)
                     }
                 }
                 if(found_index >= 0) {
-                    signal_gpio(button_map[found_index].pin);
+                    //signal_gpio(button_map[found_index].pin);
+                    signal_serial("up", dec_param);
                     ESP_LOGI(TAG, "Button %s activated", dec_param);
                     httpd_resp_send(req, "ok", HTTPD_RESP_USE_STRLEN);
                     return ESP_OK;
@@ -115,7 +124,7 @@ static esp_err_t button_deactivated(httpd_req_t *req)
                     }
                 }
                 if(found_index >= 0) {
-                    signal_gpio(button_map[found_index].pin);
+                    signal_serial("down", dec_param);
                     ESP_LOGI(TAG, "Button %s deactivated", dec_param);
                     httpd_resp_send(req, "ok", HTTPD_RESP_USE_STRLEN);
                     return ESP_OK;
