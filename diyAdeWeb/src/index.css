@@ -23,8 +23,8 @@ code {
   background-repeat: repeat;
 }
 #green_grape_btn {
-  background-image: url("./icon/green-grapes-icon.svg"), radial-gradient(circle, transparent 0%, transparent 50%, #6EC030 50%, #6EC030 100%);
-  background-size: 20%;
+  background-image: url("./icon/grapeade.png"), radial-gradient(circle, transparent 0%, transparent 50%, #6EC030 50%, #6EC030 100%);
+  background-size: 25%;
   background-repeat: repeat;
 }
 progress[value]::-webkit-progress-bar {

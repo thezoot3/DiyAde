@@ -7,6 +7,7 @@ export default function useFetchBtnAction(
 ) {
     const [Millisec, setInitMillisec] = useState(0)
     const [intervalMap, setIntervalMap] = useState({})
+    const [ingredientPercent, setIngredientPercent] = useState({})
     const fetchBtn = useCallback(
         (resource) => {
             fetch(pathSrc + resource)
@@ -20,7 +21,7 @@ export default function useFetchBtnAction(
         setInitMillisec(maxMillisec)
         setTimeout(() => {
             fetchBtn('/btn_activate?btn=done')
-            doneHandler.call()
+            doneHandler(ingredientPercent)
             setInitMillisec(0)
         }, 1500)
     }, [doneHandler, fetchBtn, maxMillisec])
@@ -28,6 +29,9 @@ export default function useFetchBtnAction(
         const interval = setInterval(() => {
             if (Millisec < maxMillisec) {
                 setInitMillisec((prev) => prev + 10)
+                setIngredientPercent((prev) => {
+                    return { ...prev, [id]: (prev[id] || 0) + 10 }
+                })
             } else {
                 stopStopwatch(id)
                 resetStopwatch()

@@ -1,5 +1,12 @@
 import useFetchBtnAction from '../FetchBtnAction'
 import { useNavigate } from 'react-router'
+import Typewriter from 'typewriter-effect'
+
+export const ingredients = {
+    lemon: '레몬',
+    grapefruit: '자몽',
+    green_grape: '청포도',
+}
 export default function MakingAde() {
     const [startTouchHandle, endTouchHandle, progress] = useFetchBtnAction(
         '/api',
@@ -16,8 +23,31 @@ export default function MakingAde() {
                 <span className="text-4xl font-bold">
                     당신만의 에이드를 만들어보세요!
                 </span>
+
                 <span className="text-2xl font-medium">
-                    원하는 맛의 버튼을 클릭해 과일 청을 추가하세요!
+                    <Typewriter
+                        onInit={(typewriter) => {
+                            typewriter
+                                .changeDelay(40)
+                                .typeString(
+                                    '에이드를 만들기 위해 버튼을 눌러주세요!',
+                                )
+                                .pauseFor(1500)
+                                .deleteAll(40)
+                                .typeString(
+                                    '원하는 맛의 버튼을 클릭해 과일 청을 추가하세요!',
+                                )
+                                .pauseFor(1500)
+                                .deleteAll()
+                                .typeString(
+                                    '아래 완료 버튼이 모두 채워지거나 완료 버튼을 누르면 탄산수가 주입됩니다!',
+                                )
+                                .pauseFor(1500)
+                                .deleteAll()
+                                .start()
+                        }}
+                        options={{ loop: true }}
+                    />
                 </span>
             </div>
 
