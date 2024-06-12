@@ -45,16 +45,16 @@ static const char *TAG = "AdeServer";
 
 void signal_gpio(int pin) {
     gpio_set_direction(pin, GPIO_MODE_OUTPUT);
-    gpio_set_level(pin, 1);
     gpio_set_pull_mode(pin, GPIO_PULLDOWN_ONLY);
-    vTaskDelay(100);
+    gpio_set_level(pin, 1);
     gpio_set_level(pin, 0);
 }
 void signal_serial(char* prefix, char* name) {
-    char* message = malloc(strlen(prefix) + strlen(name) + 3);
+    char* message = malloc(strlen(prefix) + strlen(name) + 4);
     strcpy(message, prefix);
-    strcpy(message, " ");
+    strcat(message, " ");
     strcat(message, name);
+    strcat(message, "\n");
     printf(message);
     free(message);
 }
@@ -71,23 +71,19 @@ static esp_err_t button_activated(httpd_req_t *req)
             char param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN], dec_param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN] = {0};
             if (httpd_query_key_value(buf, "btn", param, sizeof(param)) == ESP_OK) {
                 example_uri_decode(dec_param, param, strnlen(param, EXAMPLE_HTTP_QUERY_KEY_MAX_LEN));
-                int found_index = -1;
-                for (int i = 0; i < button_number; i++) {
-                    if (strcmp(button_names[i], dec_param) == 0) {
-                        found_index = i;
-                        break; 
-                    }
-                }
-                if(found_index >= 0) {
-                    //signal_gpio(button_map[found_index].pin);
-                    signal_serial("up", dec_param);
-                    ESP_LOGI(TAG, "Button %s activated", dec_param);
-                    httpd_resp_send(req, "ok", HTTPD_RESP_USE_STRLEN);
-                    return ESP_OK;
+                if(dec_param == "lemon") {
+                    signal_gpio(25);
+                } else  if(dec_param == "grapefruit") {
+                    signal_gpio(26);
+                } else  if(dec_param == "green_grape") {
+                    signal_gpio(32);
+                } else  if(dec_param == "done") {
+                    signal_gpio(33);
                 } else {
                     ESP_LOGI(TAG, "Button %s not found", dec_param);
                     httpd_resp_send(req, "error", HTTPD_RESP_USE_STRLEN);
                 }
+                free(dec_param);
             } else {
                 
             }
@@ -112,28 +108,22 @@ static esp_err_t button_deactivated(httpd_req_t *req)
     if (buf_len > 1) {
         buf = malloc(buf_len);
         if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
-            ESP_LOGI(TAG, "Found URL query => %s", buf);
             char param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN], dec_param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN] = {0};
             if (httpd_query_key_value(buf, "btn", param, sizeof(param)) == ESP_OK) {
                 example_uri_decode(dec_param, param, strnlen(param, EXAMPLE_HTTP_QUERY_KEY_MAX_LEN));
-                int found_index = -1;
-                for (int i = 0; i < button_number; i++) {
-                    if (strcmp(button_names[i], dec_param) == 0) {
-                        found_index = i;
-                        break; 
-                    }
-                }
-                if(found_index >= 0) {
-                    signal_serial("down", dec_param);
-                    ESP_LOGI(TAG, "Button %s deactivated", dec_param);
-                    httpd_resp_send(req, "ok", HTTPD_RESP_USE_STRLEN);
-                    return ESP_OK;
+                if(dec_param == "lemon") {
+                    signal_gpio(25);
+                } else  if(dec_param == "grapefruit") {
+                    signal_gpio(26);
+                } else  if(dec_param == "green_grape") {
+                    signal_gpio(32);
+                } else  if(dec_param == "done") {
+                    signal_gpio(33);
                 } else {
                     ESP_LOGI(TAG, "Button %s not found", dec_param);
                     httpd_resp_send(req, "error", HTTPD_RESP_USE_STRLEN);
                 }
-            } else {
-                
+                free(dec_param);
             }
         }
         free(buf);
@@ -155,6 +145,7 @@ static httpd_handle_t start_webserver(void)
     if (httpd_start(&server, &config) == ESP_OK) {
         ESP_LOGI(TAG, "Registering URI handlers");
         httpd_register_uri_handler(server, &btn_activate);
+        httpd_register_uri_handler(server, &btn_deactivate);
         return server;
     }
     ESP_LOGI(TAG, "Error starting server!");

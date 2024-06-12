@@ -18,13 +18,10 @@ export default function useFetchBtnAction(
         [pathSrc],
     )
     const resetStopwatch = useCallback(() => {
-        setInitMillisec(maxMillisec)
-        setTimeout(() => {
-            fetchBtn('/btn_activate?btn=done')
-            doneHandler(ingredientPercent)
-            setInitMillisec(0)
-        }, 1500)
-    }, [doneHandler, fetchBtn, maxMillisec])
+        setInitMillisec(0)
+        fetchBtn('/btn_activate?btn=done')
+        doneHandler(ingredientPercent)
+    }, [doneHandler, fetchBtn, ingredientPercent])
     function startStopwatch(id) {
         const interval = setInterval(() => {
             if (Millisec < maxMillisec) {
@@ -48,10 +45,7 @@ export default function useFetchBtnAction(
         return function () {
             fetchBtn('/btn_activate?btn=' + btn)
             if (btn === 'done') {
-                setInitMillisec(maxMillisec)
-                setTimeout(() => {
-                    setInitMillisec(0)
-                }, 2000)
+                resetStopwatch()
             }
             startStopwatch(btn)
         }

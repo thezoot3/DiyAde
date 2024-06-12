@@ -9,7 +9,7 @@ export const ingredients = {
 }
 export default function MakingAde() {
     const [startTouchHandle, endTouchHandle, progress] = useFetchBtnAction(
-        '/api',
+        'http://192.168.4.1',
         2500,
         nextStep,
     )
