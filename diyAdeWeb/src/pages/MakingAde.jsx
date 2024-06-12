@@ -2,7 +2,7 @@ import useFetchBtnAction from '../FetchBtnAction'
 import { useNavigate } from 'react-router'
 export default function MakingAde() {
     const [startTouchHandle, endTouchHandle, progress] = useFetchBtnAction(
-        '192.168.4.2/api',
+        '/api',
         2500,
         nextStep,
     )
