@@ -8,11 +8,7 @@ export const ingredients = {
     green_grape: '청포도',
 }
 export default function MakingAde() {
-    const [startTouchHandle, endTouchHandle, progress] = useFetchBtnAction(
-        'http://192.168.4.1',
-        2500,
-        nextStep,
-    )
+    const [startTouchHandle] = useFetchBtnAction('http://192.168.4.1', nextStep)
     const nav = useNavigate()
     function nextStep() {
         nav('/result')
@@ -39,11 +35,6 @@ export default function MakingAde() {
                                 )
                                 .pauseFor(1500)
                                 .deleteAll()
-                                .typeString(
-                                    '아래 완료 버튼이 모두 채워지거나 완료 버튼을 누르면 탄산수가 주입됩니다!',
-                                )
-                                .pauseFor(1500)
-                                .deleteAll()
                                 .start()
                         }}
                         options={{ loop: true }}
@@ -56,7 +47,6 @@ export default function MakingAde() {
                     className="rounded-3xl p-32 text-4xl font-bold text-black"
                     id={'lemon_btn'}
                     onTouchStart={startTouchHandle('lemon')}
-                    onTouchEnd={endTouchHandle('lemon')}
                 >
                     레몬
                 </button>
@@ -64,7 +54,6 @@ export default function MakingAde() {
                     className="rounded-3xl p-32 text-4xl font-bold text-black"
                     id={'grapefruit_btn'}
                     onTouchStart={startTouchHandle('grapefruit')}
-                    onTouchEnd={endTouchHandle('grapefruit')}
                 >
                     자몽
                 </button>
@@ -72,7 +61,6 @@ export default function MakingAde() {
                     className="rounded-3xl p-28 text-4xl font-bold text-black"
                     id={'green_grape_btn'}
                     onTouchStart={startTouchHandle('green_grape')}
-                    onTouchEnd={endTouchHandle('green_grape')}
                 >
                     청포도
                 </button>
@@ -84,10 +72,9 @@ export default function MakingAde() {
                 <progress
                     className="h-12 w-full bg-gray-100 text-xl font-bold"
                     onTouchStart={startTouchHandle('done')}
-                    onTouchEnd={endTouchHandle('done')}
                     id={'progress'}
                     max={2500}
-                    value={progress}
+                    value={2500}
                 ></progress>
             </div>
         </div>

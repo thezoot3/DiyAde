@@ -33,6 +33,11 @@
 
 #include "main.h"
 
+const char* lemon = "lemon";
+const char* grapefruit = "grapefruit";
+const char* green_grape = "green_grape";
+const char* done = "done";
+
 
 #define EXAMPLE_HTTP_QUERY_KEY_MAX_LEN  (64)
 
@@ -43,11 +48,22 @@
 
 static const char *TAG = "AdeServer";
 
-void signal_gpio(int pin) {
+void signal_gpio(const char* dec_param) {
+    int pin = 0;
+    if(strcmp(dec_param, lemon) == 0) {
+        pin = 25;
+    } else  if(strcmp(dec_param, grapefruit) == 0) {
+        pin = 26;
+    } else  if(strcmp(dec_param, green_grape) == 0) {
+        pin = 32;
+    } else  if(strcmp(dec_param, done) == 0) {
+        pin = 33;
+    }
     gpio_set_direction(pin, GPIO_MODE_OUTPUT);
-    gpio_set_pull_mode(pin, GPIO_PULLDOWN_ONLY);
-    gpio_set_level(pin, 1);
-    gpio_set_level(pin, 0);
+        gpio_set_pull_mode(pin, GPIO_PULLDOWN_ONLY);
+        gpio_set_level(pin, 1);
+        gpio_set_level(pin, 0);
+    
 }
 void signal_serial(char* prefix, char* name) {
     char* message = malloc(strlen(prefix) + strlen(name) + 4);
@@ -71,19 +87,7 @@ static esp_err_t button_activated(httpd_req_t *req)
             char param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN], dec_param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN] = {0};
             if (httpd_query_key_value(buf, "btn", param, sizeof(param)) == ESP_OK) {
                 example_uri_decode(dec_param, param, strnlen(param, EXAMPLE_HTTP_QUERY_KEY_MAX_LEN));
-                if(dec_param == "lemon") {
-                    signal_gpio(25);
-                } else  if(dec_param == "grapefruit") {
-                    signal_gpio(26);
-                } else  if(dec_param == "green_grape") {
-                    signal_gpio(32);
-                } else  if(dec_param == "done") {
-                    signal_gpio(33);
-                } else {
-                    ESP_LOGI(TAG, "Button %s not found", dec_param);
-                    httpd_resp_send(req, "error", HTTPD_RESP_USE_STRLEN);
-                }
-                free(dec_param);
+                signal_gpio(dec_param);
             } else {
                 
             }
@@ -111,19 +115,7 @@ static esp_err_t button_deactivated(httpd_req_t *req)
             char param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN], dec_param[EXAMPLE_HTTP_QUERY_KEY_MAX_LEN] = {0};
             if (httpd_query_key_value(buf, "btn", param, sizeof(param)) == ESP_OK) {
                 example_uri_decode(dec_param, param, strnlen(param, EXAMPLE_HTTP_QUERY_KEY_MAX_LEN));
-                if(dec_param == "lemon") {
-                    signal_gpio(25);
-                } else  if(dec_param == "grapefruit") {
-                    signal_gpio(26);
-                } else  if(dec_param == "green_grape") {
-                    signal_gpio(32);
-                } else  if(dec_param == "done") {
-                    signal_gpio(33);
-                } else {
-                    ESP_LOGI(TAG, "Button %s not found", dec_param);
-                    httpd_resp_send(req, "error", HTTPD_RESP_USE_STRLEN);
-                }
-                free(dec_param);
+                signal_gpio(dec_param);
             }
         }
         free(buf);

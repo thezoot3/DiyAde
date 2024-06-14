@@ -1,13 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
-export default function useFetchBtnAction(
-    pathSrc,
-    maxMillisec,
-    doneHandler = () => {},
-) {
-    const [Millisec, setInitMillisec] = useState(0)
-    const [intervalMap, setIntervalMap] = useState({})
-    const [ingredientPercent, setIngredientPercent] = useState({})
+export default function useFetchBtnAction(pathSrc, doneHandler = () => {}) {
     const fetchBtn = useCallback(
         (resource) => {
             fetch(pathSrc + resource)
@@ -17,49 +10,13 @@ export default function useFetchBtnAction(
         },
         [pathSrc],
     )
-    const resetStopwatch = useCallback(() => {
-        setInitMillisec(0)
-        fetchBtn('/btn_activate?btn=done')
-        doneHandler(ingredientPercent)
-    }, [doneHandler, fetchBtn, ingredientPercent])
-    function startStopwatch(id) {
-        const interval = setInterval(() => {
-            if (Millisec < maxMillisec) {
-                setInitMillisec((prev) => prev + 10)
-                setIngredientPercent((prev) => {
-                    return { ...prev, [id]: (prev[id] || 0) + 10 }
-                })
-            } else {
-                stopStopwatch(id)
-                resetStopwatch()
-            }
-        }, 10)
-        setIntervalMap((prev) => {
-            return { ...prev, [id]: interval }
-        })
-    }
-    function stopStopwatch(id) {
-        clearInterval(intervalMap[id])
-    }
     function startTouch(btn) {
         return function () {
             fetchBtn('/btn_activate?btn=' + btn)
             if (btn === 'done') {
-                resetStopwatch()
+                doneHandler()
             }
-            startStopwatch(btn)
         }
     }
-    function endTouch(btn) {
-        return function () {
-            fetchBtn('/btn_deactivate?btn=' + btn)
-            stopStopwatch(btn)
-        }
-    }
-    useEffect(() => {
-        if (Millisec >= maxMillisec) {
-            resetStopwatch()
-        }
-    }, [Millisec, maxMillisec, resetStopwatch])
-    return [startTouch, endTouch, Millisec]
+    return [startTouch]
 }
